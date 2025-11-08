@@ -1,131 +1,99 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الآله دي آلتي يا حبيبي</title>
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      font-family: "Segoe UI", sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .calculator {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #0008;
-      width: 280px;
-    }
-
-    input {
-      width: 100%;
-      height: 60px;
-      font-size: 1.5rem;
-      text-align: right;
-      margin-bottom: 15px;
-      border: none;
-      border-radius: 10px;
-      padding: 10px;
-      background: #334155;
-      color: white;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    button {
-      height: 60px;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 10px;
-      background: #475569;
-      color: white;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #64748b;
-    }
-
-    .equal {
-      background: #16a34a;
-    }
-
-    .equal:hover {
-      background: #22c55e;
-    }
-
-    .clear {
-      background: #dc2626;
-    }
-
-    .clear:hover {
-      background: #ef4444;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الآلة + AI</title>
+<style>
+body {background:#0f172a;color:white;font-family:"Segoe UI",sans-serif;display:flex;justify-content:center;align-items:flex-start;flex-direction:column;padding:20px;}
+.calculator, .ai-box {background:#1e293b;padding:20px;border-radius:20px;box-shadow:0 0 20px #0008;margin-bottom:20px;}
+.calculator input, .ai-box #chat-output {width:100%;height:60px;font-size:1.5rem;text-align:right;margin-bottom:15px;border:none;border-radius:10px;padding:10px;background:#334155;color:white;overflow-y:auto;}
+.buttons {display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+button {height:60px;font-size:1.2rem;border:none;border-radius:10px;background:#475569;color:white;cursor:pointer;transition:.2s;}
+button:hover{background:#64748b;}
+.equal{background:#16a34a;} .equal:hover{background:#22c55e;}
+.clear{background:#dc2626;} .clear:hover{background:#ef4444;}
+.ai-input {width:calc(100% - 70px);height:40px;font-size:1rem;padding:5px;border-radius:5px;border:none;float:right;}
+.ai-send {height:40px;width:60px;border:none;border-radius:5px;background:#16a34a;color:white;cursor:pointer;}
+</style>
 </head>
 <body>
-  <div class="calculator">
-    <input type="text" id="display" disabled>
-    <div class="buttons">
-      <button onclick="clearDisplay()" class="clear">C</button>
-      <button onclick="append('/')">÷</button>
-      <button onclick="append('*')">×</button>
-      <button onclick="back()">⌫</button>
 
-      <button onclick="append('7')">7</button>
-      <button onclick="append('8')">8</button>
-      <button onclick="append('9')">9</button>
-      <button onclick="append('-')">−</button>
+<div class="calculator">
+  <input type="text" id="display" disabled>
+  <div class="buttons">
+    <button onclick="clearDisplay()" class="clear">C</button>
+    <button onclick="append('/')">÷</button>
+    <button onclick="append('*')">×</button>
+    <button onclick="back()">⌫</button>
 
-      <button onclick="append('4')">4</button>
-      <button onclick="append('5')">5</button>
-      <button onclick="append('6')">6</button>
-      <button onclick="append('+')">+</button>
+    <button onclick="append('7')">7</button>
+    <button onclick="append('8')">8</button>
+    <button onclick="append('9')">9</button>
+    <button onclick="append('-')">−</button>
 
-      <button onclick="append('1')">1</button>
-      <button onclick="append('2')">2</button>
-      <button onclick="append('3')">3</button>
-      <button rowspan="2" onclick="calculate()" class="equal">=</button>
+    <button onclick="append('4')">4</button>
+    <button onclick="append('5')">5</button>
+    <button onclick="append('6')">6</button>
+    <button onclick="append('+')">+</button>
 
-      <button onclick="append('0')">0</button>
-      <button onclick="append('.')">.</button>
-    </div>
+    <button onclick="append('1')">1</button>
+    <button onclick="append('2')">2</button>
+    <button onclick="append('3')">3</button>
+    <button onclick="calculate()" class="equal">=</button>
+
+    <button onclick="append('0')">0</button>
+    <button onclick="append('.')">.</button>
   </div>
+</div>
 
-  <script>
-    const display = document.getElementById('display');
+<div class="ai-box">
+  <div id="chat-output"></div>
+  <input type="text" id="user-input" class="ai-input" placeholder="اسأل AI هنا">
+  <button class="ai-send" onclick="sendToFakeGPT()">أرسل</button>
+</div>
 
-    function append(value) {
-      display.value += value;
-    }
+<script>
+// الآلة الحاسبة
+const display = document.getElementById('display');
+function append(v){display.value+=v;}
+function clearDisplay(){display.value='';}
+function back(){display.value=display.value.slice(0,-1);}
+function calculate(){
+  try { display.value=eval(display.value); }
+  catch{
+    const funnyErrors=[
+      "اما انت معوق وفاكر كل النس معوقين",
+      "يا عمرو دياب ياخواااا",
+      "يا تامر ياحسني يا متناااا",
+      "الاله دي التي يا حبيبي",
+      "انا امامك بكابي يا حبيبي",
+      "كلمة جديدة احنا مدرسناهاش 😎"
+    ];
+    display.value=funnyErrors[Math.floor(Math.random()*funnyErrors.length)];
+  }
+}
 
-    function clearDisplay() {
-      display.value = '';
-    }
+// نموذج AI وهمي بدون API
+const chatOutput=document.getElementById('chat-output');
+function sendToFakeGPT(){
+  const input=document.getElementById('user-input').value;
+  chatOutput.innerHTML+=`<p><b>أنت:</b> ${input}</p>`;
+  const fakeResponses=[
+    "هههه 😂 فاكر نفسك عبقري؟",
+    "يا معلم العملية دي صعبة شوية 😎",
+    "آه، فهمت قصدك يا حبيبي 😏",
+    "خلاص يا عمرو، الموضوع بسيط 😆",
+    "أنا قدامك بكابي يا حبيبي 😎",
+    "كلمة جديدة إحنا مدرسناهاش 😅"
+  ];
+  const reply=fakeResponses[Math.floor(Math.random()*fakeResponses.length)];
+  chatOutput.innerHTML+=`<p><b>AI:</b> ${reply}</p>`;
+  document.getElementById('user-input').value='';
+  chatOutput.scrollTop=chatOutput.scrollHeight;
+}
+</script>
 
-    function back() {
-      display.value = display.value.slice(0, -1);
-    }
-
-    function calculate() {
-      try {
-        display.value = eval(display.value);
-      } catch {
-        display.value = ' خطأ ,اما انت معوق بقا وفاكر كل الناس معوقين شبهك';
-      }
-    }
-  </script>
 </body>
 </html>
+
